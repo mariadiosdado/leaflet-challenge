@@ -10,7 +10,7 @@ let layers = {
 };
   
 // Create the map with our layers.
-let map = L.map("map-id", {
+let map = L.map("map", {
 center: [40.73, -94.0059],
 zoom: 3,
 layers: [
@@ -33,7 +33,7 @@ let overlays = {
 };
 
 // Create a control for our layers, and add our overlays to it.
-L.control.layers(null, overlays).addTo(map);
+L.control.layers(streetmap, overlays).addTo(map);
 
 // use response to get GeoJson data
 let response = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
@@ -77,9 +77,7 @@ d3.json(response).then(function(data){
         },
         style: styleInfo,
         onEachFeature: function(feature, layer){
-            layer.bindPopup('<h3>Location: ${feature.properties.place}</h3>
-            <h4>Magnitude: ${feature.properties.mag}<br>Depth: ${feature.geometry.coordinates[2]}</h4>
-            <br>Time: ${new Date(feature.properties.time)}');
+            layer.bindPopup('<h3>Location: ${feature.properties.place}</h3><h4>Magnitude: ${feature.properties.mag}<br>Depth: ${feature.geometry.coordinates[2]}</h4><br>Time: ${new Date(feature.properties.time)}');
         }
     }).addTo(map);
 
@@ -103,5 +101,20 @@ info.onAdd = function(map) {
 
 // Add the info legend to the map.
 info.addTo(map);
+
+// add Tectonic plate GeoJson 
+
+d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(function(tectData){
+
+// add GeoJson layer
+L.geoJson(tectData, {
+  color: "orange", 
+  weight : 2
+}).addTo(tectonicplates);
+
+tectonicplates.addTo(map);
+
+
+});
 
 });
